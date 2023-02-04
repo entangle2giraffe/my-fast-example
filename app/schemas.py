@@ -28,6 +28,10 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserUpdate(BaseModel):
+    old_password: str
+    new_password: str
+
 class User(UserBase):
     id: int
     is_active: bool

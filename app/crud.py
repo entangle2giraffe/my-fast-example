@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 
 from . import models, schemas
 
-
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
@@ -22,6 +21,25 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def update_password(db: Session, password: schemas.UserUpdate, email: str):
+    db_user = get_user_by_email(db=db, email=email)
+
+    old_password = password.dict()["old_password"]
+    new_password = password.dict()["new_password"]
+    if old_password+"notreallyhashed" == db_user.hashed_password:
+        db_user.hashed_password = new_password + "notreallyhashed"
+
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+
+def remove_user(db: Session, user_id: int, password: str):
+    db_user = get_user(db=db, user_id=user_id)
+    
+    if password+"notreallyhashed" == db_user.hashed_password:
+        db.delete(db_user)
+        db.commit()
 
 
 def get_items(db: Session, skip: int = 0, limit: int = 100):

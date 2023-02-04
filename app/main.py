@@ -8,7 +8,6 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -38,6 +37,20 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
+
+
+@app.put("/users/{email}", response_model=schemas.User)
+def update_password(
+    email: str, password_update: schemas.UserUpdate, db: Session = Depends(get_db)
+):
+    # user input old password and new desired password
+    return crud.update_password(db=db, password=password_update, email=email)
+
+
+@app.delete("/users/{user_id}/{password}")
+def delete_user(user_id: int, password: str, db: Session = Depends(get_db)):
+    # delete the entire user
+    return crud.remove_user(db=db, user_id=user_id, password=password)
 
 
 @app.post("/users/{user_id}/items/", response_model=schemas.Item)
