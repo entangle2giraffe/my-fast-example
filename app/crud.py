@@ -37,9 +37,8 @@ def update_password(db: Session, password: schemas.UserUpdate, email: str):
 def remove_user(db: Session, user_id: int, password: str):
     db_user = get_user(db=db, user_id=user_id)
     
-    if password+"notreallyhashed" == db_user.hashed_password:
-        db.delete(db_user)
-        db.commit()
+    db.delete(db_user)
+    db.commit()
 
 
 def get_items(db: Session, skip: int = 0, limit: int = 100):
